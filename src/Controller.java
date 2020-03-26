@@ -9,9 +9,12 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.net.ConnectException;
 import java.util.concurrent.Executors;
 
 public class Controller extends JPanel {
+
+    private static boolean CONNECTION_ERROR = false;
 
     private PICtris pictris;
     private Thread readThread;
@@ -47,9 +50,14 @@ public class Controller extends JPanel {
         this.connectButton.addActionListener(e -> {
             SerialPort selectedPort = (SerialPort) portsComboBox.getSelectedItem();
             for (SerialPort sp : availablePorts) {
+                System.out.println(sp.getSystemPortName());
+                System.out.println(sp.getDescriptivePortName());
+                System.out.println(sp.toString());
+            }
+            for (SerialPort sp : availablePorts) {
                 if (sp.getSystemPortName().equals(selectedPort.getSystemPortName())) {
+                    System.out.println("Connecting...");
                     connectToPort(sp);
-                    System.out.println("Connected!");
                     break;
                 }
             }
@@ -64,6 +72,14 @@ public class Controller extends JPanel {
         this.paused = true;
 
         updatePorts();
+    }
+
+    private void sendConnectionTrama(SerialPort selectedPort) {
+        // Write your code here
+        byte[] writeBuffer = new byte[1];
+        writeBuffer[0] = (byte) 0xFF;
+
+        selectedPort.writeBytes(writeBuffer, 1);
     }
 
     public void bindPICtris(PICtris pictris) {
@@ -110,53 +126,61 @@ public class Controller extends JPanel {
             isConnected = true;
             port.openPort();
 
-            JFrame f = new JFrame("PICtris");
-            f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            f.setResizable(false);
-            f.setLayout(new BorderLayout());
-            f.setIconImage(new ImageIcon("icon.png").getImage());
+            // ---------------------- CONNECTION PROTOCOL (start) -----------------------
+            // Enviamos trama de conexion
+            sendConnectionTrama(selectedPort);
+            // ---------------------- CONNECTION PROTOCOL (end) -----------------------
+
+            if (!CONNECTION_ERROR){
+                JFrame f = new JFrame("PICtris");
+                f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                f.setResizable(false);
+                f.setLayout(new BorderLayout());
+                f.setIconImage(new ImageIcon("icon.png").getImage());
 
 
-            Thread readThread = new Thread()
-            {
-                public void run()
+                Thread readThread = new Thread()
                 {
-                    do {
-                        try {
-                            getIntput();
-                            sleep(Alumne.TIME_WAIT_MS);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }while (true);
+                    public void run()
+                    {
+                        do {
+                            try {
+                                getIntput();
+                                sleep(Alumne.TIME_WAIT_MS);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }while (true);
+                    }
+                };
+                readThread.start();
+
+                final PICtris pictris = new PICtris() {
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+                        //sendData(); // commented to debug
+                    }
+                };
+                bindPICtris(pictris);
+                f.add(pictris, BorderLayout.CENTER);
+
+                f.pack();
+                f.setLocationRelativeTo(null);
+                f.setVisible(true);
+
+
+                try {
+                    music = new MusicPlayer("song/TUSA.wav");
+                } catch (UnsupportedAudioFileException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
                 }
-            };
-            readThread.start();
-
-            final PICtris pictris = new PICtris() {
-                @Override
-                public void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    //sendData(); // commented to debug
-                }
-            };
-            bindPICtris(pictris);
-            f.add(pictris, BorderLayout.CENTER);
-
-            f.pack();
-            f.setLocationRelativeTo(null);
-            f.setVisible(true);
-
-
-            try {
-                music = new MusicPlayer("song/TUSA.wav");
-            } catch (UnsupportedAudioFileException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (LineUnavailableException e) {
-                e.printStackTrace();
             }
+
         }
 
         if (!port.openPort()) {

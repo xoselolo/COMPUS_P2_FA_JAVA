@@ -8,11 +8,14 @@ import java.util.Arrays;
 
 public class Alumne {
 
+    private static final char[] GAME_OVER_MESSAGE = "Game Over".toCharArray();
+    private static final char GAME_OVER_END_CHARACTER = '+';
+
     // Send trama
     private static int fila = 1;
 
     // Trama type
-    private final static String TRAMA_TYPE_ACK = "41"; // = A
+    public final static String TRAMA_TYPE_ACK = "41"; // = A
     private final static String TRAMA_TYPE_BUTTON = "42"; // = B
     private final static String TRAMA_TYPE_JOYSTICK = "4A"; // = J
 
@@ -32,12 +35,11 @@ public class Alumne {
         byte[] framebuffer = pictris.getFrameBuffer();
 
         // Write your code here
-        byte[] writeBuffer = new byte[1];
-        writeBuffer[0] = framebuffer[fila];
-        //writeBuffer[0] = (byte) 0x3C;
+        byte[] writeBuffer = new byte[2];
+        writeBuffer[0] = (byte) 0x00; // 0000 0000 (porque no es game over)
+        writeBuffer[1] = framebuffer[fila]; // FILA
 
-        serialPort.writeBytes(writeBuffer, 1);
-        //serialPort.writeBytes(writeBuffer, 1, 0);
+        serialPort.writeBytes(writeBuffer, 2);
     }
 
     public static void getInput(PICtris pictris, SerialPort serialPort) {
@@ -56,7 +58,9 @@ public class Alumne {
             byte[] bytes = new byte[1];
             serialPort.readBytes(bytes, 1);
             String receivedValue = convertBytes(bytes).substring(0, 2);
-            //System.out.println("Type: " + receivedValue);
+
+            //System.out.println("Received: " + receivedValue);
+
             switch (receivedValue){
                 case TRAMA_TYPE_ACK:
                     sendFila(pictris, serialPort);
@@ -199,7 +203,7 @@ public class Alumne {
         }
     }
 
-    private static String convertBytes(byte[] bytesReceived){
+    public static String convertBytes(byte[] bytesReceived){
         int length = bytesReceived.length;
         char[] hexValues = new char[length * 2];
         for (int i = 0; i < length; i++){
@@ -212,9 +216,81 @@ public class Alumne {
     }
 
     public static void gameOver(PICtris pictris, SerialPort serialPort) {
+        System.out.println("GAME OVER");
         int score = pictris.getScore();
+        String stringScore = String.valueOf(score);
+        char[] scoreArray = stringScore.toCharArray();
+        boolean isAck = false;
+        String receivedValue;
 
-        // Write your code here
+        byte[] bytes = new byte[1];
+
+        while(!isAck){
+            while (serialPort.bytesAvailable() < 1){}
+
+            serialPort.readBytes(bytes, 1);
+            receivedValue = convertBytes(bytes).substring(0, 2);
+
+            if (TRAMA_TYPE_ACK.equals(receivedValue)) {
+                isAck = true;
+            } else {
+                isAck = false;
+            }
+        }
+
+        /*
+        PROTOCOLO DE GAME OVER
+        0) Recibir ACK por parte de la PIC
+        1) Enviar caracter '1111 1111' (porque en asembler -> IS_END = 1)
+        2) Enviar mensaje de "game over"
+        3) Enviar caracter ' '
+        4) Enviar puntuacion "1452"
+        5) Enviar caracter '+'
+
+         */
+
+        int gameOverLength = GAME_OVER_MESSAGE.length;
+        int scoreLength = stringScore.length();
+        int totalLength = gameOverLength + scoreLength + 3;
+
+        byte[] writeBuffer = new byte[totalLength];
+        writeBuffer[0] = (byte) 0xFF; // 1111 1111 porque indica que es games over (IS_END = 1)
+        int i = 1;
+        for(int j = 0; j < gameOverLength; j++, i++){
+            writeBuffer[i] = (byte)GAME_OVER_MESSAGE[j];
+        }
+        writeBuffer[i] = (byte) ' ';
+        i++;
+        for(int j = 0; j < scoreLength; j++, i++){
+            writeBuffer[i] = (byte)scoreArray[j];
+        }
+        writeBuffer[i] = (byte) GAME_OVER_END_CHARACTER;
+
+        // Enviamos la trama de game over ["1game over 1452+]
+        byte[] bytesRecived = new byte[1];
+        int bytesSent = 0;
+
+        // Enviamos el 1
+        serialPort.writeBytes(writeBuffer, 1, bytesSent);
+
+        bytesSent++;
+        while (bytesSent < totalLength){
+            // wait for ACK
+            while (serialPort.bytesAvailable() < 1){}
+            System.out.println("ACK : " + bytesSent);
+
+            // read ACK
+            serialPort.readBytes(bytesRecived, 1);
+            // No miramos que hemos recibido porque lo importante es que la PIC nos
+            // vaya enviando bytes para comunicarnos que esta lista para recibir un
+            // nuevo byte
+
+            // send next byte
+            serialPort.writeBytes(writeBuffer, 1, bytesSent);
+            bytesSent++;
+        }
+
+        // El caracter entra por MARQUESINA_0 y sale por MARQUESINA_1
 
     }
 }
