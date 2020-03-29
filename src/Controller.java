@@ -75,7 +75,7 @@ public class Controller extends JPanel {
     }
 
     private void sendConnectionTrama(SerialPort selectedPort) {
-        // Write your code here
+
         byte[] writeBuffer = new byte[1];
         writeBuffer[0] = (byte) 0xFF;
 

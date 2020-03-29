@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement />
+  <nodes>
+    <node x="913.0" y="1088.0">com</node>
+    <node x="261.0" y="1011.0">netscape</node>
+    <node x="1078.0" y="1088.0">org</node>
+    <node x="671.0" y="1011.0">Solaris</node>
+    <node x="305.0" y="412.0">MusicPlayer</node>
+    <node x="0.0" y="412.0">Alumne</node>
+    <node x="868.0" y="1011.0">Windows</node>
+    <node x="163.0" y="650.0">Controller</node>
+    <node x="0.0" y="1165.0">sun</node>
+    <node x="1065.0" y="1011.0">Android</node>
+    <node x="466.0" y="1011.0">META-INF</node>
+    <node x="165.0" y="1165.0">jdk</node>
+    <node x="0.0" y="1011.0">groovyjarjarasm</node>
+    <node x="740.0" y="1088.0">java</node>
+    <node x="0.0" y="1088.0">groovy</node>
+    <node x="378.0" y="1088.0">Linux</node>
+    <node x="559.0" y="1088.0">javax</node>
+    <node x="330.0" y="1165.0">OSX</node>
+    <node x="115.90625" y="0.0">PICtris</node>
+    <node x="875.0" y="12.701171875">groovyjarjarcommonscli</node>
+    <node x="189.0" y="1088.0">javafx</node>
+    <node x="891.1928251121076" y="127.08881512362981">groovyjarjarantlr</node>
+    <node x="215.0" y="910.0">Main</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Controller" target="PICtris">
+      <point x="-63.0" y="-105.0" />
+      <point x="226.0" y="620.0" />
+      <point x="272.5" y="620.0" />
+      <point x="272.5" y="392.0" />
+      <point x="197.65625" y="392.0" />
+      <point x="-27.25" y="181.0" />
+    </edge>
+    <edge source="Controller" target="Alumne">
+      <point x="-105.0" y="-105.0" />
+      <point x="184.0" y="630.0" />
+      <point x="131.0" y="630.0" />
+      <point x="0.0" y="94.0" />
+    </edge>
+    <edge source="groovyjarjarantlr" target="groovyjarjarantlr">
+      <point x="-77.33333333333333" y="16.0" />
+      <point x="929.8594917787742" y="179.0888151236298" />
+      <point x="871.1928251121076" y="179.0888151236298" />
+      <point x="871.1928251121076" y="153.75548179029647" />
+      <point x="-116.0" y="10.666666666666666" />
+    </edge>
+    <edge source="Alumne" target="PICtris">
+      <point x="0.0" y="-94.0" />
+      <point x="131.0" y="392.0" />
+      <point x="143.15625" y="392.0" />
+      <point x="-81.75" y="181.0" />
+    </edge>
+    <edge source="Main" target="Controller">
+      <point x="-37.0" y="-28.0" />
+      <point x="252.0" y="885.0" />
+      <point x="226.0" y="885.0" />
+      <point x="-63.0" y="105.0" />
+    </edge>
+    <edge source="groovyjarjarcommonscli" target="groovyjarjarcommonscli">
+      <point x="-68.0" y="16.0" />
+      <point x="943.0" y="64.701171875" />
+      <point x="855.0" y="64.701171875" />
+      <point x="855.0" y="36.701171875" />
+      <point x="-136.0" y="8.0" />
+    </edge>
+    <edge source="Controller" target="MusicPlayer">
+      <point x="105.0" y="-105.0" />
+      <point x="394.0" y="630.0" />
+      <point x="438.5" y="630.0" />
+      <point x="44.5" y="94.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic Group" zoom="1.0024975024975025" x="627.314536191107" y="485.74688589935226" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

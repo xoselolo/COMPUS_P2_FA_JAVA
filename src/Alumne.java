@@ -8,7 +8,8 @@ import java.util.Arrays;
 
 public class Alumne {
 
-    private static final char[] GAME_OVER_MESSAGE = "Game Over".toCharArray();
+    private static final char[] GAME_OVER_MESSAGE = "Over".toCharArray();
+    //private static final char[] GAME_OVER_MESSAGE = "THE END".toCharArray();
     private static final char GAME_OVER_END_CHARACTER = '+';
 
     // Send trama
